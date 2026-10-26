@@ -490,14 +490,14 @@ form.addEventListener("submit",async e=>{
       service_id:EMAILJS.serviceId,template_id:EMAILJS.templateId,user_id:EMAILJS.publicKey,
       template_params:{kunde_navn:d.kunde.navn,kunde_epost:d.kunde.epost,tidspunkt:d.kunde.tidspunkt||"Ikke oppgitt",kommentar:d.kunde.kommentar||"Ingen",
         bestilling:orderText(d),antall:d.antall,rabatt_prosent:d.rabattProsent,total_eks_mva:kr(d.totalEksMva),total_inkl_mva:kr(d.totalInklMva)}})});
-    if(!r.ok) throw new Error(r.status);
+    if(!r.ok) throw new Error(r.status+" "+(await r.text()).slice(0,200));
     form.hidden=true;
     const done=document.getElementById("done");
     done.innerHTML=`<b>Takk, ${esc(d.kunde.navn.split(" ")[0])}! Bestillingen er sendt.</b>En kopi er sendt til ${esc(d.kunde.epost)}. Fredrik tar kontakt for å avtale dag.`;
     done.hidden=false; burst();
-  }catch(_){
-    btn.disabled=false; status.classList.add("err");
-    status.textContent="Bestillingen kom ikke frem. Prøv igjen, eller send valgene til fredrik@bernmedia.no.";
+  }catch(err){
+    btn.disabled=false; status.classList.add("err"); console.error("EmailJS",err);
+    status.textContent="Bestillingen kom ikke frem. Prøv igjen, eller send valgene til fredrik@bernmedia.no. (Feilkode: "+err.message+")";
   }
 });
 
